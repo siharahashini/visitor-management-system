@@ -15,8 +15,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($username === '' || $password === '' || $fullname === '') {
         $error = "All fields are required.";
     } else {
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
         $stmt = mysqli_prepare($conn, "INSERT INTO Users (Username, Password, FullName, Role, Status) VALUES (?,?,?,?,?)");
-        mysqli_stmt_bind_param($stmt, "sssss", $username, $password, $fullname, $role, $status);
+        mysqli_stmt_bind_param($stmt, "sssss", $username, $hashed_password, $fullname, $role, $status);
         if (mysqli_stmt_execute($stmt)) {
             header("Location: users.php");
             exit();
@@ -38,7 +39,7 @@ require_once 'includes/header.php';
         <input type="text" name="username" required>
 
         <label>Password</label>
-        <input type="text" name="password" required>
+        <input type="password" name="password" required>
 
         <label>Full Name</label>
         <input type="text" name="fullname" required>

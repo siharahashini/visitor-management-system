@@ -62,11 +62,11 @@ CREATE TABLE Visits (
 
 -- The assignment REQUIRES a default ordinary user uoc / uoc
 INSERT INTO Users (Username, Password, FullName, Role, Status)
-VALUES ('uoc', 'uoc', 'Default User', 'user', 'active');
+VALUES ('uoc', '$2y$10$hvlFVTUu5V9656yX9/yzTOChML/DZSFsDsSdH5ziUILxn3Iuupcui', 'Default User', 'user', 'active');
 
 -- We also need at least one administrator to test admin pages
 INSERT INTO Users (Username, Password, FullName, Role, Status)
-VALUES ('admin', 'admin123', 'System Administrator', 'admin', 'active');
+VALUES ('admin', '$2y$10$FlzdH1cxD69M/z98Fh1MfOj92Zx2xU.4.xuIwGjUq4DIGSG4TtNNW', 'System Administrator', 'admin', 'active');
 
 -- Sample departments so the visitor form has something to pick from
 INSERT INTO Departments (Name) VALUES
@@ -76,8 +76,6 @@ INSERT INTO Departments (Name) VALUES
 ('Finance');
 
 -- NOTE on passwords:
--- Passwords are stored as plain text here ONLY to keep the project
--- simple enough to explain in your viva. In your individual report
--- you can mention that PHP's built-in password_hash()/password_verify()
--- functions (part of core PHP, not a framework/library) would be used
--- in a production system for real security.
+-- Passwords are stored using PHP's built-in password_hash() function
+-- and checked during login with password_verify(). The default login
+-- details are still uoc / uoc and admin / admin123.

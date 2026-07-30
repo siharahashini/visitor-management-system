@@ -24,15 +24,16 @@ $username = trim($_POST['username'] ?? '');
 $password = trim($_POST['password'] ?? '');
 
 if ($action === 'register') {
+    $full_name = trim($_POST['full_name'] ?? '');
     $confirm_password = trim($_POST['confirm_password'] ?? '');
 
-    if ($username === '' || $password === '' || $confirm_password === '') {
-        header("Location: index.php?error=" . urlencode("Please fill in all fields."));
+    if ($full_name === '' || $username === '' || $password === '' || $confirm_password === '') {
+        header("Location: index.php?mode=register&error=" . urlencode("Please fill in all fields."));
         exit();
     }
 
     if ($password !== $confirm_password) {
-        header("Location: index.php?error=" . urlencode("Passwords do not match."));
+        header("Location: index.php?mode=register&error=" . urlencode("Passwords do not match."));
         exit();
     }
 
@@ -42,27 +43,27 @@ if ($action === 'register') {
     $check_result = mysqli_stmt_get_result($check_stmt);
 
     if (mysqli_fetch_assoc($check_result)) {
-        header("Location: index.php?error=" . urlencode("Username already exists."));
+        header("Location: index.php?mode=register&error=" . urlencode("Username already exists."));
         exit();
     }
 
-    $full_name = $username;
+    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
     $role = 'user';
     $status = 'active';
 
     $insert_stmt = mysqli_prepare($conn, "INSERT INTO Users (Username, Password, FullName, Role, Status) VALUES (?,?,?,?,?)");
-    mysqli_stmt_bind_param($insert_stmt, "sssss", $username, $password, $full_name, $role, $status);
+    mysqli_stmt_bind_param($insert_stmt, "sssss", $username, $hashed_password, $full_name, $role, $status);
 
     if (mysqli_stmt_execute($insert_stmt)) {
         header("Location: index.php?success=" . urlencode("Account created successfully. Please log in."));
         exit();
     }
 
-    header("Location: index.php?error=" . urlencode("Could not create account. Please try again."));
+    header("Location: index.php?mode=register&error=" . urlencode("Could not create account. Please try again."));
     exit();
 }
 
-// Look up the user by username only, then compare the password in PHP.
+// Look up the user by username only, then verify the hashed password in PHP.
 $stmt = mysqli_prepare($conn, "SELECT UserID, Username, Password, FullName, Role, Status FROM Users WHERE Username = ?");
 mysqli_stmt_bind_param($stmt, "s", $username);
 mysqli_stmt_execute($stmt);
@@ -79,7 +80,19 @@ if ($user['Status'] === 'blocked') {
     exit();
 }
 
-if ($password !== $user['Password']) {
+$stored_password = $user['Password'];
+$password_matches = password_verify($password, $stored_password);
+
+// Allow old plain-text rows to log in once, then replace them with a secure hash.
+if (!$password_matches && hash_equals($stored_password, $password)) {
+    $password_matches = true;
+    $new_hash = password_hash($password, PASSWORD_DEFAULT);
+    $update_stmt = mysqli_prepare($conn, "UPDATE Users SET Password = ? WHERE UserID = ?");
+    mysqli_stmt_bind_param($update_stmt, "si", $new_hash, $user['UserID']);
+    mysqli_stmt_execute($update_stmt);
+}
+
+if (!$password_matches) {
     header("Location: index.php?error=" . urlencode("Incorrect password."));
     exit();
 }
