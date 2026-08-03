@@ -1,165 +1,99 @@
 <?php
-include "db.php";
+require_once 'includes/auth_check.php';
+require_once 'includes/header.php';
 
-
-$message = "";
-
-
-if(isset($_POST['checkin'])){
-
-    $visitor_id = $_POST['visitor_id'];
-    $visitor_name = $_POST['visitor_name'];
-
-    $sql = "INSERT INTO visitors(visitor_id, visitor_name, check_in)
-            VALUES('$visitor_id','$visitor_name',NOW())";
-
-
-    if($conn->query($sql)){
-        $message = "Visitor Checked In Successfully";
-    }
-}
-
-
-
-if(isset($_POST['checkout'])){
-
-    $visitor_id = $_POST['visitor_id'];
-
-    $sql = "UPDATE visitors 
-            SET check_out=NOW(), status='Checked Out'
-            WHERE visitor_id='$visitor_id' 
-            AND check_out IS NULL";
-
-
-    if($conn->query($sql)){
-        $message = "Visitor Checked Out Successfully";
-    }
-}
-
-
-$result = $conn->query("SELECT * FROM visitors ORDER BY id DESC");
-
+$mode = (isset($_GET['mode']) && $_GET['mode'] === 'register') ? 'register' : 'login';
+$error = isset($_GET['error']) ? $_GET['error'] : '';
+$success = isset($_GET['success']) ? $_GET['success'] : '';
 ?>
 
+<div class="auth-page">
+    <div class="auth-shell">
+        <section class="auth-hero">
+            <div class="auth-pill">Visitor Management System</div>
+            <h1>Welcome back to the front desk.</h1>
+            <p>
+                Sign in to manage visitors, review reports, and keep every entry organized in one place.
+            </p>
 
-<!DOCTYPE html>
-<html>
+            <div class="auth-highlights">
+                <div>
+                    <strong>Quick access</strong>
+                    <span>Fast login for daily use</span>
+                </div>
+                <div>
+                    <strong>Safe records</strong>
+                    <span>Protected user sessions</span>
+                </div>
+                <div>
+                    <strong>Simple onboarding</strong>
+                    <span>Create an account in seconds</span>
+                </div>
+            </div>
+        </section>
 
-<head>
+        <section class="auth-card">
+            <div class="auth-header">
+                <span class="auth-badge"><?php echo $mode === 'register' ? 'Create account' : 'Sign in'; ?></span>
+                <h2><?php echo $mode === 'register' ? 'Register' : 'Login'; ?></h2>
+                <p>
+                    <?php echo $mode === 'register' ? 'Create a new account to start using the system.' : 'Use your account details to continue.'; ?>
+                </p>
+            </div>
 
-<title>Visitor Management System</title>
+            <?php if ($error !== ''): ?>
+                <div class="auth-alert auth-alert-error"><?php echo htmlspecialchars($error); ?></div>
+            <?php endif; ?>
 
-<link rel="stylesheet" href="style.css">
+            <?php if ($success !== ''): ?>
+                <div class="auth-alert auth-alert-success"><?php echo htmlspecialchars($success); ?></div>
+            <?php endif; ?>
 
-</head>
+            <?php if ($mode === 'register'): ?>
+                <form class="auth-form" method="post" action="login_process.php">
+                    <input type="hidden" name="action" value="register">
 
+                    <label for="full_name">Full Name</label>
+                    <input type="text" id="full_name" name="full_name" placeholder="Your full name" required>
 
-<body>
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Choose a username" required>
 
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Create a password" required>
 
-<div class="container">
+                    <label for="confirm_password">Confirm Password</label>
+                    <input type="password" id="confirm_password" name="confirm_password" placeholder="Repeat your password" required>
 
+                    <button class="auth-button" type="submit">Create Account</button>
+                </form>
 
-<h1>🏢 Online Visitor Management System</h1>
+                <p class="auth-switch">
+                    Already have an account? <a href="index.php">Log in</a>
+                </p>
+            <?php else: ?>
+                <form class="auth-form" method="post" action="login_process.php">
+                    <input type="hidden" name="action" value="login">
 
-<p>Welcome! Please check in or check out below.</p>
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Enter your username" required>
 
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
 
-<h3><?php echo $message; ?></h3>
+                    <button class="auth-button" type="submit">Log In</button>
+                </form>
 
+                <p class="auth-switch">
+                    Need an account? <a href="index.php?mode=register">Register here</a>
+                </p>
 
-<form method="POST">
-
-
-<label>Visitor ID</label>
-
-<input type="text" name="visitor_id" required>
-
-
-
-<label>Visitor Name</label>
-
-<input type="text" name="visitor_name">
-
-
-
-<button name="checkin">
-✅ Check In
-</button>
-
-
-<button name="checkout">
-🚪 Check Out
-</button>
-
-
-</form>
-
-
-
-<h2>Today's Visitor Records</h2>
-
-
-<table>
-
-
-<tr>
-
-<th>ID</th>
-<th>Visitor ID</th>
-<th>Name</th>
-<th>Check In</th>
-<th>Check Out</th>
-<th>Status</th>
-
-</tr>
-
-
-<?php
-
-while($row=$result->fetch_assoc()){
-
-?>
-
-
-<tr>
-
-<td><?php echo $row['id']; ?></td>
-
-<td><?php echo $row['visitor_id']; ?></td>
-
-<td><?php echo $row['visitor_name']; ?></td>
-
-<td><?php echo $row['check_in']; ?></td>
-
-<td><?php echo $row['check_out']; ?></td>
-
-<td><?php echo $row['status']; ?></td>
-
-
-</tr>
-
-
-<?php } ?>
-
-
-</table>
-
-
-<br>
-
-<a href="help.php">
-<button class="help">
-❓ Help
-</button>
-</a>
-
-
+                <p class="auth-note">
+                    Default account: <strong>uoc / uoc</strong>
+                </p>
+            <?php endif; ?>
+        </section>
+    </div>
 </div>
 
-
-<script src="script.js"></script>
-
-</body>
-
-</html>
+<?php require_once 'includes/footer.php'; ?>
