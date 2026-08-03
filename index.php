@@ -1,124 +1,165 @@
 <?php
-/*
-    index.php
-    ---------
-    This is the FIRST page a user sees (as required by the spec).
-    If someone is already logged in, we send them straight to
-    home.php instead of showing the login form again.
-*/
-require_once 'includes/auth_check.php';
+include "db.php";
 
-if (isLoggedIn()) {
-    header("Location: home.php");
-    exit();
+
+$message = "";
+
+
+if(isset($_POST['checkin'])){
+
+    $visitor_id = $_POST['visitor_id'];
+    $visitor_name = $_POST['visitor_name'];
+
+    $sql = "INSERT INTO visitors(visitor_id, visitor_name, check_in)
+            VALUES('$visitor_id','$visitor_name',NOW())";
+
+
+    if($conn->query($sql)){
+        $message = "Visitor Checked In Successfully";
+    }
 }
 
-// If login_process.php sent us back here with an error or success message, show it.
-$error = isset($_GET['error']) ? $_GET['error'] : '';
-$success = isset($_GET['success']) ? $_GET['success'] : '';
-$mode = isset($_GET['mode']) && $_GET['mode'] === 'register' ? 'register' : 'login';
 
-require_once 'includes/header.php';
+
+if(isset($_POST['checkout'])){
+
+    $visitor_id = $_POST['visitor_id'];
+
+    $sql = "UPDATE visitors 
+            SET check_out=NOW(), status='Checked Out'
+            WHERE visitor_id='$visitor_id' 
+            AND check_out IS NULL";
+
+
+    if($conn->query($sql)){
+        $message = "Visitor Checked Out Successfully";
+    }
+}
+
+
+$result = $conn->query("SELECT * FROM visitors ORDER BY id DESC");
+
 ?>
 
-<section class="auth-page">
-    <div class="auth-hero">
-        <p class="eyebrow">Secure Visitor Access</p>
-        <h1>Welcome Back</h1>
-        <p>Manage visitor records, check-ins, reports, and users from one clean dashboard.</p>
-        <div class="auth-highlights">
-            <span>Fast check-in</span>
-            <span>Visitor reports</span>
-            <span>Admin control</span>
-        </div>
-    </div>
 
-    <div class="auth-card">
-        <div id="loginForm" class="auth-panel <?php echo $mode === 'login' ? 'active' : ''; ?>">
-            <div class="auth-heading">
-                <p class="eyebrow">Account Login</p>
-                <h2>Sign in to VMS</h2>
-            </div>
+<!DOCTYPE html>
+<html>
 
-            <?php if ($error && $mode === 'login'): ?>
-                <p class="message error"><?php echo htmlspecialchars($error); ?></p>
-            <?php endif; ?>
+<head>
 
-            <?php if ($success): ?>
-                <p class="message success"><?php echo htmlspecialchars($success); ?></p>
-            <?php endif; ?>
+<title>Visitor Management System</title>
 
-            <form action="login_process.php" method="post" class="auth-form">
-                <input type="hidden" name="action" value="login">
+<link rel="stylesheet" href="style.css">
 
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" placeholder="Enter your username" required>
+</head>
 
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" placeholder="Enter your password" required>
 
-                <button type="submit">Login</button>
-            </form>
+<body>
 
-            <p class="auth-switch">
-                Don't have an account?
-                <a href="?mode=register" data-show-register>Create new</a>
-            </p>
-        </div>
 
-        <div id="registerForm" class="auth-panel <?php echo $mode === 'register' ? 'active' : ''; ?>">
-            <div class="auth-heading">
-                <p class="eyebrow">New Account</p>
-                <h2>Create your account</h2>
-            </div>
+<div class="container">
 
-            <?php if ($error && $mode === 'register'): ?>
-                <p class="message error"><?php echo htmlspecialchars($error); ?></p>
-            <?php endif; ?>
 
-            <form action="login_process.php" method="post" class="auth-form">
-                <input type="hidden" name="action" value="register">
+<h1>🏢 Online Visitor Management System</h1>
 
-                <label for="full_name">Full Name</label>
-                <input type="text" id="full_name" name="full_name" placeholder="Enter your full name" required>
+<p>Welcome! Please check in or check out below.</p>
 
-                <label for="reg_username">Username</label>
-                <input type="text" id="reg_username" name="username" placeholder="Choose a username" required>
 
-                <label for="reg_password">Password</label>
-                <input type="password" id="reg_password" name="password" placeholder="Create a password" required>
+<h3><?php echo $message; ?></h3>
 
-                <label for="confirm_password">Confirm Password</label>
-                <input type="password" id="confirm_password" name="confirm_password" placeholder="Re-enter password" required>
 
-                <button type="submit">Create Account</button>
-            </form>
+<form method="POST">
 
-            <p class="auth-switch">
-                Already have an account?
-                <a href="?mode=login" data-show-login>Login here</a>
-            </p>
-        </div>
-    </div>
-</section>
 
-<script>
-    const loginPanel = document.getElementById('loginForm');
-    const registerPanel = document.getElementById('registerForm');
+<label>Visitor ID</label>
 
-    document.querySelector('[data-show-register]').addEventListener('click', function (event) {
-        event.preventDefault();
-        loginPanel.classList.remove('active');
-        registerPanel.classList.add('active');
-        history.replaceState(null, '', '?mode=register');
-    });
+<input type="text" name="visitor_id" required>
 
-    document.querySelector('[data-show-login]').addEventListener('click', function (event) {
-        event.preventDefault();
-        registerPanel.classList.remove('active');
-        loginPanel.classList.add('active');
-        history.replaceState(null, '', '?mode=login');
-    });
-</script>
 
-<?php require_once 'includes/footer.php'; ?>
+
+<label>Visitor Name</label>
+
+<input type="text" name="visitor_name">
+
+
+
+<button name="checkin">
+✅ Check In
+</button>
+
+
+<button name="checkout">
+🚪 Check Out
+</button>
+
+
+</form>
+
+
+
+<h2>Today's Visitor Records</h2>
+
+
+<table>
+
+
+<tr>
+
+<th>ID</th>
+<th>Visitor ID</th>
+<th>Name</th>
+<th>Check In</th>
+<th>Check Out</th>
+<th>Status</th>
+
+</tr>
+
+
+<?php
+
+while($row=$result->fetch_assoc()){
+
+?>
+
+
+<tr>
+
+<td><?php echo $row['id']; ?></td>
+
+<td><?php echo $row['visitor_id']; ?></td>
+
+<td><?php echo $row['visitor_name']; ?></td>
+
+<td><?php echo $row['check_in']; ?></td>
+
+<td><?php echo $row['check_out']; ?></td>
+
+<td><?php echo $row['status']; ?></td>
+
+
+</tr>
+
+
+<?php } ?>
+
+
+</table>
+
+
+<br>
+
+<a href="help.php">
+<button class="help">
+❓ Help
+</button>
+</a>
+
+
+</div>
+
+
+<script src="script.js"></script>
+
+</body>
+
+</html>

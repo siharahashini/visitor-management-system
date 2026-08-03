@@ -1,16 +1,16 @@
 <?php
-// Database Connection
 
 $servername = "localhost";
 $username = "root";
-$password = "2003";      
-$database = "visitor_management";
+$password = "";
+$dbname = "visitor_management";
 
-// Create Connection
-$conn = mysqli_connect($servername, $username, $password, $database);
 
-// Check Connection
-if (!$conn) {
-    die("Database Connection Failed: " . mysqli_connect_error());
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+
+if ($conn->connect_error) {
+    die("Database Connection Failed: " . $conn->connect_error);
 }
+
 ?>
