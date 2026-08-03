@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Users</title>
+<style>
+body{font-family:Arial;background:#f4f4f4;}
+div{width:700px;margin:auto;background:white;padding:20px;}
+table{width:100%;border-collapse:collapse;margin-top:15px;}
+th,td{border:1px solid gray;padding:8px;text-align:center;}
+input,select,button{padding:6px;margin:3px;}
+</style>
+</head>
+
+<body>
+
+<div>
+
+<h2>User Management</h2>
+
+<input id="name" placeholder="Name">
+<input id="email" placeholder="Email">
+
+<select id="role">
+<option>Admin</option>
+<option>User</option>
+</select>
+
+<button onclick="addUser()">Add</button>
+
+<br><br>
+
+<input id="search" placeholder="Search" onkeyup="searchUser()">
+
+<table id="table">
+<tr>
+<th>Name</th>
+<th>Email</th>
+<th>Role</th>
+<th>Action</th>
+</tr>
+</table>
+
+</div>
+
+<script>
+
+function addUser(){
+
+let name=document.getElementById("name").value;
+let email=document.getElementById("email").value;
+let role=document.getElementById("role").value;
+
+if(name=="" || email=="") return alert("Fill all fields");
+
+table.innerHTML += `
+<tr>
+<td>${name}</td>
+<td>${email}</td>
+<td>${role}</td>
+<td>
+<button onclick="editUser(this)">Edit</button>
+<button onclick="this.parentElement.parentElement.remove()">Delete</button>
+</td>
+</tr>`;
+
+name.value="";
+email.value="";
+}
+
+function editUser(btn){
+
+let row=btn.parentElement.parentElement;
+
+document.getElementById("name").value=row.cells[0].innerHTML;
+document.getElementById("email").value=row.cells[1].innerHTML;
+document.getElementById("role").value=row.cells[2].innerHTML;
+
+row.remove();
+
+}
+
+function searchUser(){
+
+let value=document.getElementById("search").value.toLowerCase();
+
+let rows=document.getElementById("table").rows;
+
+for(let i=1;i<rows.length;i++){
+
+rows[i].style.display=
+rows[i].innerText.toLowerCase().includes(value) ? "" : "none";
+
+}
+
+}
+
+</script>
+
+</body>
+</html>
