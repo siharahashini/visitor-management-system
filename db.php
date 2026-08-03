@@ -3,7 +3,7 @@
 
 $servername = "localhost";
 $username = "root";
-$password = "2003";      
+$password = "";      
 $database = "visitor_management";
 
 // Create Connection

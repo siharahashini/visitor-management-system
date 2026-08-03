@@ -16,7 +16,8 @@ if (isset($_GET['delete']) && isAdmin()) {
 // ---- Search ----
 $q = isset($_GET['q']) ? trim($_GET['q']) : '';
 
-$sql = "SELECT v.*, d.Name AS DeptName FROM Visitors v
+$sql = "SELECT v.VisitorID, v.Name, v.NIC, v.Phone, v.Purpose, v.Host, d.Name AS DeptName
+        FROM Visitors v
         LEFT JOIN Departments d ON v.Department = d.DepartmentID";
 
 if ($q !== '') {
@@ -30,6 +31,8 @@ if ($q !== '') {
     $sql .= " ORDER BY v.VisitorID DESC";
     $result = mysqli_query($conn, $sql);
 }
+
+$visitorCount = $result ? mysqli_num_rows($result) : 0;
 
 require_once 'includes/header.php';
 ?>
@@ -68,6 +71,11 @@ require_once 'includes/header.php';
             </td>
         </tr>
         <?php endwhile; ?>
+        <?php if ($visitorCount === 0): ?>
+        <tr>
+            <td colspan="8" style="text-align:center; padding:20px;">No visitors found.</td>
+        </tr>
+        <?php endif; ?>
     </table>
 </div>
 

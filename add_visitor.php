@@ -4,7 +4,13 @@ requireLogin();
 require_once 'config/db.php';
 
 $error = '';
-$departments = mysqli_query($conn, "SELECT * FROM Departments ORDER BY Name");
+$departmentRows = [];
+$departments = mysqli_query($conn, "SELECT DepartmentID, Name FROM Departments ORDER BY Name");
+while ($d = mysqli_fetch_assoc($departments)) {
+    $departmentRows[] = $d;
+}
+$name = $nic = $phone = $email = $purpose = $host = '';
+$selectedDepartment = 0;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name    = trim($_POST['name']);
@@ -13,10 +19,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email   = trim($_POST['email']);
     $purpose = trim($_POST['purpose']);
     $host    = trim($_POST['host']);
-    $dept    = (int) $_POST['department'];
+    $dept    = (int) ($_POST['department'] ?? 0);
+    $selectedDepartment = $dept;
 
-    if ($name === '' || $nic === '') {
-        $error = "Name and NIC are required.";
+    if ($name === '' || $nic === '' || $dept === 0) {
+        $error = "Name, NIC and Department are required.";
     } else {
         // 1) Insert into Visitors
         $stmt = mysqli_prepare($conn,
@@ -47,32 +54,32 @@ require_once 'includes/header.php';
 
     <form method="post">
         <label>Full Name</label>
-        <input type="text" name="name" required>
+        <input type="text" name="name" value="<?php echo htmlspecialchars($name); ?>" required>
 
         <label>NIC</label>
-        <input type="text" name="nic" required>
+        <input type="text" name="nic" value="<?php echo htmlspecialchars($nic); ?>" required>
 
         <label>Phone</label>
-        <input type="tel" name="phone">
+        <input type="tel" name="phone" value="<?php echo htmlspecialchars($phone); ?>">
 
         <label>Email</label>
-        <input type="email" name="email">
+        <input type="email" name="email" value="<?php echo htmlspecialchars($email); ?>">
 
         <label>Purpose of Visit</label>
-        <input type="text" name="purpose">
+        <input type="text" name="purpose" value="<?php echo htmlspecialchars($purpose); ?>">
 
         <label>Host / Person to meet</label>
-        <input type="text" name="host">
+        <input type="text" name="host" value="<?php echo htmlspecialchars($host); ?>">
 
         <label>Department</label>
-        <select name="department">
-            <?php while ($d = mysqli_fetch_assoc($departments)): ?>
-                <option value="<?php echo $d['DepartmentID']; ?>"><?php echo htmlspecialchars($d['Name']); ?></option>
-            <?php endwhile; ?>
+        <select name="department" required>
+            <option value="">Select department</option>
+            <?php foreach ($departmentRows as $d): ?>
+                <option value="<?php echo $d['DepartmentID']; ?>"<?php echo ($d['DepartmentID'] === $selectedDepartment ? ' selected' : ''); ?>><?php echo htmlspecialchars($d['Name']); ?></option>
+            <?php endforeach; ?>
         </select>
 
         <button type="submit">Register & Check In</button>
     </form>
 </div>
-
 <?php require_once 'includes/footer.php'; ?>

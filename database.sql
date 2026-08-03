@@ -70,10 +70,16 @@ VALUES ('admin', '$2y$10$FlzdH1cxD69M/z98Fh1MfOj92Zx2xU.4.xuIwGjUq4DIGSG4TtNNW',
 
 -- Sample departments so the visitor form has something to pick from
 INSERT INTO Departments (Name) VALUES
-('Front Office'),
+('Reception'),
 ('Administration'),
+('Human Resources'),
 ('IT Department'),
-('Finance');
+('Finance'),
+('Marketing'),
+('Sales'),
+('Security'),
+('Operations'),
+('Conference Room');
 
 -- NOTE on passwords:
 -- Passwords are stored using PHP's built-in password_hash() function
