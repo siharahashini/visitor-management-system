@@ -1,31 +1,61 @@
-<?php
-require_once 'includes/auth_check.php';
-require_once 'includes/header.php';
-?>
+<!DOCTYPE html>
 
-<div class="card">
-    <h1>Help</h1>
+<html>
 
-    <h3>1. Logging in</h3>
-    <p>Go to the Login page and enter your username and password. If you don't have an
-       account, use the default account <strong>uoc / uoc</strong>. Administrators can
-       log in with <strong>admin / admin123</strong>.</p>
+<head>
 
-    <h3>2. Registering a visitor</h3>
-    <p>Go to <em>Visitors → + Register New Visitor</em>, fill in the visitor's details and
-       submit. The visitor is automatically checked in with the current time.</p>
+<title>Help</title>
 
-    <h3>3. Checking a visitor out</h3>
-    <p>Go to <em>Visit Reports</em>, find the visitor in today's list, and click
-       <em>Check Out</em>.</p>
+<link rel="stylesheet" href="style.css">
 
-    <h3>4. Viewing reports</h3>
-    <p>The Reports page shows all visits for a chosen date, plus a monthly summary of
-       how many visits happened each day.</p>
+</head>
 
-    <h3>5. Admin tasks</h3>
-    <p>Administrators can add, edit, delete and search user accounts from the
-       Admin Dashboard, and can also delete visitor records.</p>
+
+<body>
+
+
+<div class="container">
+
+
+<h1>❓ Help Page</h1>
+
+
+<h3>How to use the system</h3>
+
+
+<p>
+1. Enter Visitor ID and Name.
+</p>
+
+<p>
+2. Click Check In button when visitor arrives.
+</p>
+
+<p>
+3. When visitor leaves, enter the same Visitor ID.
+</p>
+
+<p>
+4. Click Check Out button.
+</p>
+
+<p>
+5. The system automatically records the time.
+</p>
+
+
+<a href="index.php">
+
+<button>
+Back to Home
+</button>
+
+</a>
+
+
 </div>
 
-<?php require_once 'includes/footer.php'; ?>
+
+</body>
+
+</html>

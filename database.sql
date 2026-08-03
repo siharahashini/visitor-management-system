@@ -1,10 +1,5 @@
--- ============================================================
--- Online Visitor Management System - Database Script
--- Import this file first using phpMyAdmin (or the mysql command
--- line) BEFORE you open the website in your browser.
--- ============================================================
+CREATE DATABASE visitor_management;
 
-CREATE DATABASE IF NOT EXISTS visitor_management;
 USE visitor_management;
 
 -- ------------------------------------------------------------
