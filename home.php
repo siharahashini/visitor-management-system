@@ -11,8 +11,8 @@ require_once 'includes/header.php';
 
     <div class="tiles">
         <a class="tile" href="visitor.php">Register / View Visitors</a>
-        <a class="tile" href="reports.php">Visit Reports</a>
         <?php if (isAdmin()): ?>
+            <a class="tile" href="reports.php">Visit Reports</a>
             <a class="tile" href="admin.php">Admin Dashboard</a>
         <?php endif; ?>
         <a class="tile" href="functionalities.php">All Functionalities</a>

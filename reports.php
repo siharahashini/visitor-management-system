@@ -1,6 +1,6 @@
 <?php
 require_once 'includes/auth_check.php';
-requireLogin();
+requireadmin();
 require_once 'config/db.php';
 
 // ---- Handle "Check Out" button ----
